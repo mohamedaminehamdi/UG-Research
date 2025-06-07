@@ -59,8 +59,8 @@ export default function SignInPage() {
     try {
       console.log("Tentative de connexion avec:", email)
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: "aminehamdifcb@gmail.com",
-        password:"5qLT'TVPd&c}@.N",
+        email: email,
+        password: password,
       })
 
       if (error) {
