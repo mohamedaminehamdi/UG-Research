@@ -1,6 +1,7 @@
 "use client"
 import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import type React from "react"
+import { startTransition } from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
@@ -22,14 +23,16 @@ export default function SignInPage() {
   const searchParams = useSearchParams()
   const errorParam = searchParams.get("error")
   const verifiedParam = searchParams.get("verified")
-        const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient()
 
   // Vérifier si l'utilisateur est déjà connecté
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession()
       if (data.session) {
-        router.push("/dashboard")
+        startTransition(() => {
+  router.push("/dashboard")
+})
         console.log("Utilisateur déjà connecté, redirection vers le dashboard")
       }
     }

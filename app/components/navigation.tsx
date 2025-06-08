@@ -4,7 +4,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
+import { useRouter } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,8 @@ import { Bell, MessageSquare, Settings, LogOut, User, Home, Users, BookOpen, Tar
 export function Navigation() {
   const [notifications] = useState(3)
   const [user, setUser] = useState<any>(null);
-  const supabase = createClientComponentClient();
+  const supabase = useSupabaseClient();
+  const router = useRouter();
 
   useEffect(() => {
     const getUser = async () => {
@@ -36,6 +38,11 @@ export function Navigation() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (!session) {
+      // Clear cookies if user signed out
+      document.cookie = 'sb-access-token=; Max-Age=0; path=/'
+      document.cookie = 'sb-refresh-token=; Max-Age=0; path=/'
+    }
     });
 
     return () => subscription.unsubscribe();
@@ -142,7 +149,14 @@ export function Navigation() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => supabase.auth.signOut()}>
+        <DropdownMenuItem 
+        onClick={async () => {
+    await supabase.auth.signOut()
+    document.cookie = 'sb-access-token=; Max-Age=0; path=/'
+    document.cookie = 'sb-refresh-token=; Max-Age=0; path=/'
+    router.push("/dashboard")
+  }}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Déconnexion</span>
         </DropdownMenuItem>
