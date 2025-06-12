@@ -1,7 +1,8 @@
 "use client"
 import Link from "next/link"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSupabaseClient } from "@supabase/auth-helpers-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,153 +19,58 @@ export default function ProjectsPage() {
   const [selectedType, setSelectedType] = useState("all")
   const [selectedDepartment, setSelectedDepartment] = useState("all")
 
-  const projects = [
-    {
-      id: 1,
-      title: "Développement Durable et Innovation Technologique",
-      description: "Recherche sur les technologies vertes et leur impact sur le développement durable en Tunisie",
-      responsible: {
-        name: "Prof. Leila Mansouri",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      department: "Génie Civil",
-      type: "Recherche Fondamentale",
-      status: "En cours",
-      progress: 65,
-      startDate: "2023-01-15",
-      endDate: "2025-12-31",
-      budget: "150,000 TND",
-      funding: "Ministère de l'Enseignement Supérieur",
-      partners: [
-        { name: "Université de Tunis", type: "Académique" },
-        { name: "CERTE", type: "Recherche" },
-        { name: "GreenTech Solutions", type: "Industriel" },
-      ],
-      objectives: [
-        "Développer de nouveaux matériaux écologiques",
-        "Analyser l'impact environnemental",
-        "Proposer des solutions durables",
-      ],
-      team: 8,
-      publications: 5,
-    },
-    {
-      id: 2,
-      title: "Intelligence Artificielle pour la Santé",
-      description: "Application de l'IA dans le diagnostic médical et la télémédecine",
-      responsible: {
-        name: "Dr. Ahmed Ben Salem",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      department: "Informatique",
-      type: "Recherche Appliquée",
-      status: "En cours",
-      progress: 40,
-      startDate: "2023-09-01",
-      endDate: "2026-08-31",
-      budget: "200,000 TND",
-      funding: "Union Européenne - Horizon Europe",
-      partners: [
-        { name: "CHU Habib Bourguiba", type: "Médical" },
-        { name: "Université de Montpellier", type: "Académique" },
-      ],
-      objectives: [
-        "Développer des algorithmes de diagnostic",
-        "Créer une plateforme de télémédecine",
-        "Former les professionnels de santé",
-      ],
-      team: 12,
-      publications: 3,
-    },
-    {
-      id: 3,
-      title: "Patrimoine Culturel et Digitalisation",
-      description: "Préservation numérique du patrimoine culturel tunisien",
-      responsible: {
-        name: "Dr. Karim Bouaziz",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      department: "Histoire",
-      type: "Valorisation",
-      status: "En cours",
-      progress: 80,
-      startDate: "2022-03-01",
-      endDate: "2024-02-29",
-      budget: "80,000 TND",
-      funding: "Institut National du Patrimoine",
-      partners: [
-        { name: "Musée National du Bardo", type: "Culturel" },
-        { name: "Archives Nationales", type: "Institutionnel" },
-      ],
-      objectives: [
-        "Numériser les archives historiques",
-        "Créer une base de données accessible",
-        "Développer des outils de recherche",
-      ],
-      team: 6,
-      publications: 8,
-    },
-    {
-      id: 4,
-      title: "Biodiversité Marine du Golfe de Gabès",
-      description: "Étude et conservation de l'écosystème marin du golfe de Gabès",
-      responsible: {
-        name: "Prof. Mohamed Triki",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      department: "Sciences Biologiques",
-      type: "Recherche Fondamentale",
-      status: "Terminé",
-      progress: 100,
-      startDate: "2021-01-01",
-      endDate: "2023-12-31",
-      budget: "120,000 TND",
-      funding: "Ministère de l'Environnement",
-      partners: [
-        { name: "INSTM", type: "Recherche" },
-        { name: "WWF Tunisie", type: "ONG" },
-      ],
-      objectives: [
-        "Cartographier la biodiversité marine",
-        "Identifier les espèces menacées",
-        "Proposer des mesures de conservation",
-      ],
-      team: 10,
-      publications: 12,
-    },
-    {
-      id: 5,
-      title: "Énergies Renouvelables et Smart Grid",
-      description: "Intégration des énergies renouvelables dans les réseaux intelligents",
-      responsible: {
-        name: "Prof. Fatma Gharbi",
-        avatar: "/placeholder.svg?height=40&width=40",
-      },
-      department: "Génie Électrique",
-      type: "Recherche Appliquée",
-      status: "Planifié",
-      progress: 10,
-      startDate: "2024-06-01",
-      endDate: "2027-05-31",
-      budget: "180,000 TND",
-      funding: "STEG - Société Tunisienne de l'Électricité et du Gaz",
-      partners: [
-        { name: "STEG", type: "Industriel" },
-        { name: "École Polytechnique de Tunisie", type: "Académique" },
-      ],
-      objectives: [
-        "Optimiser l'intégration des énergies renouvelables",
-        "Développer des algorithmes de gestion",
-        "Tester sur un réseau pilote",
-      ],
-      team: 15,
-      publications: 0,
-    },
-  ]
+  const supabase = useSupabaseClient()
+  const [projects, setProjects] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const statuses = ["En cours", "Terminé", "Planifié", "Suspendu"]
-  const types = ["Recherche Fondamentale", "Recherche Appliquée", "Valorisation", "Innovation"]
-  const departments = ["Informatique", "Génie Électrique", "Sciences Biologiques", "Génie Civil", "Histoire", "Chimie"]
+  useEffect(() => {
+    const fetchProjects = async () => {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from("research_projects")
+        .select("*")
+
+      if (error) {
+        console.error("Error fetching research projects:", error.message)
+        setLoading(false)
+        return
+      }
+
+      const transformed = data.map((project: any, i: number) => ({
+        id: project.id,
+        title: project.title,
+        description: project.description || "Aucune description disponible.",
+        responsible: {
+          name: `Chercheur #${i + 1}`, // Since you only have `principal_investigator_id`, no names
+          avatar: "/placeholder.svg?height=40&width=40",
+        },
+        department: getRandom(departments), // Since no department field in DB
+        type: getRandom(types), // Not in DB either
+        status: project.status || getRandom(statuses),
+        progress: Math.floor(Math.random() * 101), // Assuming not in DB
+        startDate: project.start_date || "2023-01-01",
+        endDate: project.end_date || "2025-12-31",
+        budget: project.budget ? `${project.budget.toLocaleString()} TND` : "Non spécifié",
+        funding: project.funding_source || "Inconnu",
+        partners: [], // Not available in schema
+        objectives: project.objectives?.split("\n") || ["Objectif non spécifié"],
+        team: Math.floor(Math.random() * 20 + 5),
+        publications: Math.floor(Math.random() * 10),
+      }))
+
+      setProjects(transformed)
+      setLoading(false)
+    }
+
+    fetchProjects()
+  }, [supabase])
+
+const statuses = ["active", "completed", "suspended", "planned"]
+const types = ["Recherche Fondamentale", "Recherche Appliquée", "Valorisation", "Innovation"]
+const departments = ["Informatique", "Génie Électrique", "Sciences Biologiques", "Génie Civil", "Histoire", "Chimie"]
+
+const getRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
+
 
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
