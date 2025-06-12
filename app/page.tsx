@@ -112,7 +112,7 @@ export default function HomePage() {
                 <Users className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Chercheurs</p>
-                  <p className="text-2xl font-bold">342</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
               </div>
             </CardContent>
@@ -123,7 +123,7 @@ export default function HomePage() {
                 <BookOpen className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Publications</p>
-                  <p className="text-2xl font-bold">1,247</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
               </div>
             </CardContent>
@@ -134,7 +134,7 @@ export default function HomePage() {
                 <Target className="h-8 w-8 text-purple-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Projets Actifs</p>
-                  <p className="text-2xl font-bold">28</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
               </div>
             </CardContent>
@@ -145,7 +145,7 @@ export default function HomePage() {
                 <TrendingUp className="h-8 w-8 text-orange-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Collaborations</p>
-                  <p className="text-2xl font-bold">156</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
               </div>
             </CardContent>

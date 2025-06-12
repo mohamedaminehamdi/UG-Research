@@ -20,12 +20,12 @@ import { Navigation } from "../components/navigation"
 
 export default function DashboardPage() {
   const stats = {
-    totalResearchers: 342,
-    totalPublications: 1247,
-    activeProjects: 28,
-    collaborations: 156,
-    hIndexAverage: 8.5,
-    citationsTotal: 15420,
+    totalResearchers: 0,
+    totalPublications: 0,
+    activeProjects: 0,
+    collaborations: 0,
+    hIndexAverage: 0,
+    citationsTotal: 0,
   }
 
   const departmentStats = [
