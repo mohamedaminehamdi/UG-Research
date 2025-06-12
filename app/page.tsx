@@ -244,6 +244,24 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </div>
+      <footer className="bg-blue-900 text-white mt-16">
+  <div className="container mx-auto px-4 py-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h2 className="text-lg font-semibold mb-2">Université de Gabès</h2>
+        <p>Adresse : Rue Omar Ibn Khattab, 6029 Gabès</p>
+      </div>
+      <div>
+        <p>Téléphone : (+216) 75 396 955 / (+216) 75 396 966</p>
+        <p>Fax : (+216) 75 393 500</p>
+        <p>Email : <a href="mailto:univgb@univgb.rnu.tn" className="text-orange-400 hover:underline">univgb@univgb.rnu.tn</a></p>
+      </div>
+    </div>
+    <div className="text-center mt-6 text-sm text-gray-300">
+      © {new Date().getFullYear()} Université de Gabès. Tous droits réservés.
+    </div>
+  </div>
+</footer>
     </div>
   )
 }
