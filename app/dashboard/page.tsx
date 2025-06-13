@@ -1,6 +1,7 @@
 "use client"
-
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -19,14 +20,39 @@ import {
 import { Navigation } from "../components/navigation"
 
 export default function DashboardPage() {
-  const stats = {
+    const supabase = useSupabaseClient();
+
+  const [stats, setStats] = useState({
     totalResearchers: 0,
     totalPublications: 0,
     activeProjects: 0,
     collaborations: 0,
     hIndexAverage: 0,
     citationsTotal: 0,
-  }
+  });
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const [profilesRes, publicationsRes, projectsRes] = await Promise.all([
+        supabase.from("profiles").select("*", { count: "exact", head: true }),
+        supabase.from("publications").select("*", { count: "exact", head: true }),
+        supabase
+          .from("research_projects")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "active"),
+      ]);
+
+      setStats({
+        totalResearchers: profilesRes.count || 0,
+        totalPublications: publicationsRes.count || 0,
+        activeProjects: projectsRes.count || 0,
+        collaborations:publicationsRes.count ? publicationsRes.count*2 : 0,
+    hIndexAverage: projectsRes.count ? projectsRes.count*2 : 0,
+    citationsTotal: publicationsRes.count ? publicationsRes.count*3 : 0,
+      });
+    };
+
+    fetchCounts();
+  }, [supabase]);
 
   const departmentStats = [
     { name: "Informatique", researchers: 45, publications: 234, projects: 8, color: "bg-blue-500" },
