@@ -155,27 +155,40 @@ const [stats, setStats] = useState({
       <Navigation />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">UG-Research</h1>
-            <p className="text-xl mb-8">Plateforme de gestion des chercheurs de l'Université de Gabès</p>
-            <div className="max-w-md mx-auto">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Rechercher un chercheur, une publication..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-white text-gray-900"
-                />
-              </div>
-            </div>
+     <div className="relative z-0">
+  {/* Background section with logo and overlay */}
+  <div
+    className="relative z-0 bg-center bg-no-repeat bg-contain"
+    style={{
+      backgroundImage: "url('/logo.jpg')",
+    }}
+  >
+    {/* Dark overlay confined to this section */}
+    <div className="bg-black/40 w-full h-full">
+      <div className="container mx-auto px-4 py-16 text-white text-center">
+        <h1 className="text-4xl font-bold mb-4">UG-Research</h1>
+        <p className="text-xl mb-8">
+          Plateforme de gestion des chercheurs de l'Université de Gabès
+        </p>
+        <div className="max-w-md mx-auto">
+          <div className="relative">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Rechercher un chercheur, une publication..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white text-gray-900"
+            />
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      {/* Statistics Cards */}
+  {/* Other components — naturally on top */}
+  <div className="relative z-10">
+    {/* Your statistics cards or other content */}
+    {/* Statistics Cards */}
       <div className="container mx-auto px-4 -mt-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -223,6 +236,14 @@ const [stats, setStats] = useState({
             </CardContent>
           </Card>
         </div>
+  </div>
+</div>
+
+
+
+
+
+      
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Recent Publications */}

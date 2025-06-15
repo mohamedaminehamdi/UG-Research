@@ -164,10 +164,10 @@ export default function ResearchersPage() {
               </div>
               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Département" />
+                  <SelectValue placeholder="Laboratoire" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les départements</SelectItem>
+                  <SelectItem value="all">Tous les laboratoires</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept} value={dept}>
                       {dept}

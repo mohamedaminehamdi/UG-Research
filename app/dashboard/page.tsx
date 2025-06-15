@@ -204,7 +204,7 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <PieChart className="w-5 h-5" />
-                Statistiques par Département
+                Statistiques par Laboratoire
               </CardTitle>
               <CardDescription>Répartition des chercheurs, publications et projets</CardDescription>
             </CardHeader>

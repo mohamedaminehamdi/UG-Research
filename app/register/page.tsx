@@ -236,13 +236,13 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="department">Département/Institut</Label>
+                <Label htmlFor="department">Laboratoire/Institut</Label>
                 <Select
                   value={formData.department}
                   onValueChange={(value) => setFormData({ ...formData, department: value })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez votre département" />
+                    <SelectValue placeholder="Sélectionnez votre laboratoire" />
                   </SelectTrigger>
                   <SelectContent>
                     {departments.map((dept) => (

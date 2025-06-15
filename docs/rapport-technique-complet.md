@@ -416,7 +416,7 @@ Next.js a été sélectionné pour ses avantages :
 **Système de rôles :**
 - **Admin** : Accès complet à la plateforme
 - **Researcher** : Gestion de ses données personnelles
-- **Department Head** : Gestion de son département
+- **Department Head** : Gestion de son Laboratoire
 - **Viewer** : Consultation des données publiques
 
 **Permissions granulaires :**

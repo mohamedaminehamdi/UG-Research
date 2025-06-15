@@ -284,7 +284,7 @@ Vous pouvez personnaliser votre tableau de bord en :
 **Informations de base :**
 - **Nom et prénom** : Nom complet tel qu'il apparaîtra publiquement
 - **Titre académique** : Professeur, Maître de conférences, etc.
-- **Département** : Votre département d'affiliation principal
+- **Laboratoire** : Votre laboratoire d'affiliation principal
 - **Laboratoire** : Laboratoire de recherche d'appartenance
 - **Bureau** : Numéro de bureau et bâtiment
 - **Téléphone** : Numéro de téléphone professionnel
@@ -461,8 +461,8 @@ Vous pouvez définir la visibilité pour chaque section :
 - Plage d'années
 - Dernières années (1, 3, 5 ans)
 
-**Par département :**
-- Filtrage par département d'affiliation des auteurs
+**Par laboratoire :**
+- Filtrage par laboratoire d'affiliation des auteurs
 - Possibilité de sélection multiple
 
 **Par statut :**
@@ -647,7 +647,7 @@ Vous pouvez définir la visibilité pour chaque section :
 
 **Prérequis :**
 - Être habilité à diriger des recherches
-- Avoir l'autorisation de votre département
+- Avoir l'autorisation de votre laboratoire
 - Disposer d'un financement confirmé ou potentiel
 
 **Étapes de création :**
@@ -824,9 +824,9 @@ Vous pouvez définir la visibilité pour chaque section :
 - Identifiez les expertises complémentaires
 - Découvrez de nouveaux champs de recherche
 
-**Par département :**
+**Par laboratoire :**
 - Recherche interdisciplinaire
-- Collaboration inter-départements
+- Collaboration inter-laboratoires
 - Projets transversaux
 - Échanges d'expertise
 
@@ -1161,7 +1161,7 @@ Le système suggère des collaborateurs potentiels basés sur :
 - **Tendances** : Croissance ou décroissance
 - **Saisonnalité** : Patterns de publication
 - **Prédictions** : Projections basées sur l'historique
-- **Comparaisons** : Avec les moyennes départementales
+- **Comparaisons** : Avec les moyennes laboratoireales
 
 **Évolution des citations :**
 - **Citations par année** : Accumulation dans le temps
@@ -1178,8 +1178,8 @@ Le système suggère des collaborateurs potentiels basés sur :
 
 ### 9.4 Comparaisons et benchmarking
 
-**Comparaisons départementales :**
-- **Classement** : Position relative dans votre département
+**Comparaisons laboratoireales :**
+- **Classement** : Position relative dans votre laboratoire
 - **Médianes** : Comparaison avec les valeurs médianes
 - **Quartiles** : Positionnement dans la distribution
 - **Évolution** : Progression relative dans le temps
@@ -1301,7 +1301,7 @@ Le système suggère des collaborateurs potentiels basés sur :
 - **Décennie** : Regroupement par périodes
 
 **Filtres géographiques :**
-- **Département UG** : Filtrage par département
+- **Laboratoire UG** : Filtrage par laboratoire
 - **Pays** : Pour les collaborations internationales
 - **Région** : Regroupement géographique
 - **Institution** : Filtrage par établissement
@@ -1656,7 +1656,7 @@ Le système suggère des collaborateurs potentiels basés sur :
 - **Annonces** : Informations officielles
 
 **Groupes d'utilisateurs :**
-- **Par département** : Groupes disciplinaires
+- **Par laboratoire** : Groupes disciplinaires
 - **Par fonction** : Chercheurs, administrateurs, étudiants
 - **Par niveau** : Débutants, intermédiaires, experts
 - **Événements** : Rencontres et ateliers
