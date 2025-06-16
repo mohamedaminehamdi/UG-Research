@@ -103,20 +103,30 @@ export default function HomePage() {
       // Fetch top researchers (profiles)
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("first_name, last_name, department, avatar_url")
+        .select("first_name, last_name, department, email")
         .limit(10);
 
       if (profilesError) {
         console.error("Error fetching profiles:", profilesError);
       } else if (profiles) {
-        const researchersFormatted: Researcher[] = profiles.map((prof) => ({
-          name: `${prof.first_name || ""} ${prof.last_name || ""}`.trim() || "Unknown",
-          department: prof.department || "Inconnu",
-          publications: Math.floor(Math.random() * 60) + 10, // fake pubs count
-          hIndex: randomHIndex(),
-          avatar: prof.avatar_url || "/placeholder.svg?height=40&width=40",
-        }));
-        setTopResearchers(researchersFormatted);
+        
+        const researchersFormatted: Researcher[] = profiles.map((prof) => {
+  const formattedEmail = prof.email?.replace(/[@.]/g, "_") || "";
+  const { data: avatarData } = supabase.storage
+    .from("avatars")
+    .getPublicUrl(`users/${formattedEmail}.jpg`);
+  const avatarUrl = avatarData?.publicUrl || "";
+
+  return {
+    name: `${prof.first_name || ""} ${prof.last_name || ""}`.trim() || "Unknown",
+    department: prof.department || "Inconnu",
+    publications: Math.floor(Math.random() * 60) + 10, // fake pubs count
+    hIndex: randomHIndex(),
+    avatar_url: avatarUrl,
+  };
+});
+
+setTopResearchers(researchersFormatted);
       }
     }
 
@@ -284,13 +294,15 @@ const [stats, setStats] = useState({
                 {topResearchers.map((researcher, index) => (
                   <div key={index} className="flex items-center space-x-3">
                     <Avatar>
-                      <AvatarImage src={researcher.avatar || "/placeholder.svg"} />
-                      <AvatarFallback>
-                        {researcher.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
+                     <img
+          src={
+            researcher.avatar_url && researcher.avatar_url !== ""
+              ? researcher.avatar_url
+              : "/placeholder.svg?height=96&width=96"
+          }
+          alt={researcher.name}
+          className="w-12 h-12 rounded-full object-cover"
+        />
                     </Avatar>
                     <div className="flex-1">
                       <p className="font-medium">{researcher.name}</p>

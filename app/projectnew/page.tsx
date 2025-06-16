@@ -24,18 +24,21 @@ export default function CreateResearchProject() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
+  e.preventDefault()
+  setError(null)
+  setLoading(true)
 
-    const user = (await supabase.auth.getUser()).data.user
-    if (!user) {
-      setError("Utilisateur non connecté")
-      setLoading(false)
-      return
-    }
+  const user = (await supabase.auth.getUser()).data.user
+  if (!user) {
+    setError("Utilisateur non connecté")
+    setLoading(false)
+    return
+  }
 
-    const { error } = await supabase.from("research_projects").insert({
+  // Insert the project and get the inserted data
+  const { data: insertedProject, error: insertError } = await supabase
+    .from("research_projects")
+    .insert({
       title,
       description,
       principal_investigator_id: user.id,
@@ -49,18 +52,22 @@ export default function CreateResearchProject() {
       methodology,
       expected_outcomes: expectedOutcomes,
     })
+    .select()
+    .single()
 
-    if (error) {
-      setError(error.message)
-      return
-    } 
-     // Send notification
+  if (insertError) {
+    setError(insertError.message)
+    setLoading(false)
+    return
+  }
+
+  // Now insert the notification
   const { error: notifError } = await supabase.from("notifications").insert({
     user_id: null, // broadcast to all users
     title: "Nouveau projet de recherche",
     message: `📢 Un nouveau projet intitulé "${title}" a été créé.`,
     type: "research_project",
-    action_url: "/projects", // or `/projects/${projectData.id}` if you have a details page
+    action_url: "/projects",
   })
 
   if (notifError) {
@@ -71,6 +78,7 @@ export default function CreateResearchProject() {
   router.push("/projects")
   setLoading(false)
 }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

@@ -67,7 +67,23 @@ export default function ProjectsPage() {
 
 const statuses = ["active", "completed", "suspended", "planned"]
 const types = ["Recherche Fondamentale", "Recherche Appliquée", "Valorisation", "Innovation"]
-const departments = ["Informatique", "Génie Électrique", "Sciences Biologiques", "Génie Civil", "Histoire", "Chimie"]
+const departments = [
+    "INFORMATIQUE, RESEAUX, SYSTEMES DE COMMUNICATION ET MATHEMATIQUES",
+    "BIODIVERSITE, MOLECULES ET APPLICATIONS",
+    "THERMODYNAMIQUE APPLIQUEE",
+    "MATHEMATIQUES ET APPLICATIONS",
+    "GEOSYSTEMES, GEORESSOURCES ET GEOENVIRONNEMENTS",
+    "MODELISATION, ANALYSE ET COMMANDE DES SYSTEMES",
+    "ENERGIE, EAU, ENVIRONNEMENT ET PROCEDES",
+    "MATERIAUX AVANCES, MECANIQUE APPLIQUEE, PROCEDES INNOVANTS ET ENVIRONNEMENT",
+    "ENTREPRISE ET DECISIONS",
+    "ECOLOGIE DE LA FAUNE TERRESTRE",
+    "MODELISATION EN GENIE CIVIL ET ENVIRONNEMENT",
+  ];
+
+
+
+
 
 const getRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
 
@@ -178,7 +194,7 @@ const getRandom = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length
                   <SelectValue placeholder="Laboratoire" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les laboratoires</SelectItem>
+                  <SelectItem value="all">Tous les laboratoires ou Unités</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept} value={dept}>
                       {dept}
