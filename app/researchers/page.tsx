@@ -237,6 +237,8 @@ export default function ResearchersPage() {
     height={96}
     className="rounded-full object-cover"
   />
+
+  
 </Avatar>
 
                     <div className="flex-1">
