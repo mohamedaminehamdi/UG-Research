@@ -7,8 +7,20 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { UserRole } from "@/lib/types"
@@ -29,11 +41,12 @@ export default function SignUpPage() {
     phone: "",
     bio: "",
   })
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-      const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient()
 
   const departments = [
     "Faculté des Sciences de Gabès",
@@ -44,6 +57,24 @@ export default function SignUpPage() {
     "Institut Supérieur des Arts et Métiers de Gabès",
     "Institut Supérieur des Langues de Gabès",
   ]
+
+  const uploadPhoto = async (file: File, email: string) => {
+    const fileExt = file.name.split(".").pop()
+    const fileName = `${email.replace(/[^a-zA-Z0-9]/g, "_")}.${fileExt}`
+    const filePath = `users/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: true,
+      })
+
+    if (uploadError) throw uploadError
+
+    const { data } = supabase.storage.from("avatars").getPublicUrl(filePath)
+    return data.publicUrl
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,9 +94,11 @@ export default function SignUpPage() {
     }
 
     try {
-      console.log("Tentative d'inscription...")
+      let photoUrl = ""
+      if (photoFile) {
+        photoUrl = await uploadPhoto(photoFile, formData.email)
+      }
 
-      // Créer le compte avec Supabase
       const { data, error } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -79,16 +112,14 @@ export default function SignUpPage() {
             laboratory: formData.laboratory,
             phone: formData.phone,
             bio: formData.bio,
+            photo_url: photoUrl,
           },
         },
       })
 
       if (error) throw error
-
-      console.log("Inscription réussie:", data)
       setSuccess(true)
     } catch (error: any) {
-      console.error("Erreur d'inscription:", error)
       setError(error.message || "Erreur lors de la création du compte")
     } finally {
       setLoading(false)
@@ -97,25 +128,28 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
         <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="text-center text-green-600">Compte créé avec succès !</CardTitle>
+            <CardTitle className="text-center text-green-600">
+              Compte créé avec succès !
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <Mail className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <p className="text-sm text-gray-700">
-                Votre compte a été créé avec l'email <strong>{formData.email}</strong>
+                Votre compte a été créé avec l'email{" "}
+                <strong>{formData.email}</strong>
               </p>
-              <p className="text-xs text-gray-500 mt-2">Vous pouvez maintenant vous connecter</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Vous pouvez maintenant vous connecter
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <Button onClick={() => router.push("/login")} className="w-full">
-                Aller à la page de connexion
-              </Button>
-            </div>
+            <Button onClick={() => router.push("/login")} className="w-full">
+              Aller à la page de connexion
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -123,7 +157,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
       <div className="max-w-2xl w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
@@ -131,7 +165,9 @@ export default function SignUpPage() {
               <span className="text-white font-bold text-lg">UG</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Créer un compte chercheur</h2>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Créer un compte chercheur
+          </h2>
           <p className="mt-2 text-sm text-gray-600">
             Rejoignez la communauté scientifique de l&apos;Université de Gabès
           </p>
@@ -140,7 +176,9 @@ export default function SignUpPage() {
         <Card>
           <CardHeader>
             <CardTitle>Informations personnelles</CardTitle>
-            <CardDescription>Remplissez vos informations pour créer votre profil de chercheur</CardDescription>
+            <CardDescription>
+              Remplissez vos informations pour créer votre profil de chercheur
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -150,13 +188,34 @@ export default function SignUpPage() {
                 </Alert>
               )}
 
+              <div className="space-y-2">
+                <Label htmlFor="photo">Photo de profil</Label>
+                <Input
+                  id="photo"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setPhotoFile(e.target.files ? e.target.files[0] : null)
+                  }
+                />
+                {photoFile && (
+                  <img
+                    src={URL.createObjectURL(photoFile)}
+                    alt="Aperçu"
+                    className="w-24 h-24 mt-2 rounded-full object-cover"
+                  />
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">Prénom *</Label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, firstName: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -165,7 +224,9 @@ export default function SignUpPage() {
                   <Input
                     id="lastName"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lastName: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -177,8 +238,9 @@ export default function SignUpPage() {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="votre.email@exemple.com"
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                 />
               </div>
@@ -190,17 +252,26 @@ export default function SignUpPage() {
                     id="password"
                     type="password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
+                  <Label htmlFor="confirmPassword">
+                    Confirmer le mot de passe *
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     required
                   />
                 </div>
@@ -211,38 +282,49 @@ export default function SignUpPage() {
                   <Label htmlFor="role">Statut</Label>
                   <Select
                     value={formData.role}
-                    onValueChange={(value: UserRole) => setFormData({ ...formData, role: value })}
+                    onValueChange={(value: UserRole) =>
+                      setFormData({ ...formData, role: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="researcher">Enseignant-Chercheur</SelectItem>
+                      <SelectItem value="researcher">
+                        Enseignant-Chercheur
+                      </SelectItem>
                       <SelectItem value="student">Doctorant</SelectItem>
-                      <SelectItem value="lab_director">Directeur de laboratoire</SelectItem>
+                      <SelectItem value="lab_director">
+                        Directeur de laboratoire
+                      </SelectItem>
                       <SelectItem value="admin">Administrateur</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="title">Titre/Grade</Label>
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     placeholder="Professeur, Maître de conférences..."
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="department">Laboratoire/Institut</Label>
+                <Label htmlFor="department">Département</Label>
                 <Select
                   value={formData.department}
-                  onValueChange={(value) => setFormData({ ...formData, department: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, department: value })
+                  }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez votre laboratoire" />
+                    <SelectValue placeholder="Sélectionnez votre département" />
                   </SelectTrigger>
                   <SelectContent>
                     {departments.map((dept) => (
@@ -256,12 +338,13 @@ export default function SignUpPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="laboratory">Laboratoire de recherche</Label>
+                  <Label htmlFor="laboratory">Laboratoire</Label>
                   <Input
                     id="laboratory"
                     value={formData.laboratory}
-                    onChange={(e) => setFormData({ ...formData, laboratory: e.target.value })}
-                    placeholder="Nom du laboratoire"
+                    onChange={(e) =>
+                      setFormData({ ...formData, laboratory: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -269,19 +352,21 @@ export default function SignUpPage() {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+216 XX XXX XXX"
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="bio">Biographie/Présentation</Label>
+                <Label htmlFor="bio">Biographie</Label>
                 <Textarea
                   id="bio"
                   value={formData.bio}
-                  onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                  placeholder="Présentez brièvement vos domaines de recherche et intérêts..."
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
                   rows={4}
                 />
               </div>
@@ -296,16 +381,17 @@ export default function SignUpPage() {
                   "Créer mon compte"
                 )}
               </Button>
-            </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <div className="text-center text-sm text-gray-600 mt-4">
                 Déjà un compte ?{" "}
-                <Link href="/login" className="text-blue-600 hover:text-blue-500">
+                <Link
+                  href="/login"
+                  className="text-blue-600 hover:text-blue-500"
+                >
                   Se connecter
                 </Link>
-              </p>
-            </div>
+              </div>
+            </form>
           </CardContent>
         </Card>
       </div>

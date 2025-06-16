@@ -104,7 +104,7 @@ export default function ConfirmSuccessPage() {
 
           // Rediriger vers le tableau de bord après 3 secondes
           setTimeout(() => {
-            router.push("/dashboard")
+            router.push("/")
           }, 3000)
         } else {
           setError("Session utilisateur non trouvée.")
@@ -167,7 +167,7 @@ export default function ConfirmSuccessPage() {
               </div>
 
               <div className="space-y-2">
-                <Button onClick={() => router.push("/dashboard")} className="w-full">
+                <Button onClick={() => router.push("/")} className="w-full">
                   Accéder au tableau de bord
                 </Button>
                 <Link href="/profile">

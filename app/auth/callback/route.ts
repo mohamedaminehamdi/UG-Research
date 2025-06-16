@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
       }
 
       // Rediriger vers le tableau de bord
-      return NextResponse.redirect(new URL("/dashboard", requestUrl.origin))
+      return NextResponse.redirect(new URL("/", requestUrl.origin))
     } catch (error) {
       console.error("Exception lors de l'échange du code:", error)
       return NextResponse.redirect(new URL("/auth/signin?error=callback_exception", requestUrl.origin))

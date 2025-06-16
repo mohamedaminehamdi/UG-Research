@@ -32,7 +32,7 @@ export default function Header() {
   }
 
   const navigation = [
-    { name: "Accueil", href: "/dashboard", icon: Home },
+    { name: "Accueil", href: "/", icon: Home },
     { name: "Chercheurs", href: "/researchers", icon: Users },
     { name: "Publications", href: "/publications", icon: BookOpen },
     { name: "Projets", href: "/projects", icon: Briefcase },
@@ -45,7 +45,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/dashboard" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">UG</span>
               </div>

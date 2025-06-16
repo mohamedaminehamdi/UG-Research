@@ -51,85 +51,106 @@ type Researcher = {
 }
 
 export default function ResearchersPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedDepartment, setSelectedDepartment] = useState("all")
-  const [selectedGrade, setSelectedGrade] = useState("all")
-  const [researchers, setResearchers] = useState<Researcher[]>([])
+   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [selectedGrade, setSelectedGrade] = useState("all");
+  const [researchers, setResearchers] = useState<Researcher[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient();
 
   const departments = [
-    "Informatique",
-    "Génie Électrique",
-    "Sciences Biologiques",
-    "Génie Civil",
-    "Histoire",
-    "Chimie",
-  ]
+    "INFORMATIQUE, RESEAUX, SYSTEMES DE COMMUNICATION ET MATHEMATIQUES",
+    "BIODIVERSITE, MOLECULES ET APPLICATIONS",
+    "THERMODYNAMIQUE APPLIQUEE",
+    "MATHEMATIQUES ET APPLICATIONS",
+    "GEOSYSTEMES, GEORESSOURCES ET GEOENVIRONNEMENTS",
+    "MODELISATION, ANALYSE ET COMMANDE DES SYSTEMES",
+    "ENERGIE, EAU, ENVIRONNEMENT ET PROCEDES",
+    "MATERIAUX AVANCES, MECANIQUE APPLIQUEE, PROCEDES INNOVANTS ET ENVIRONNEMENT",
+    "ENTREPRISE ET DECISIONS",
+    "ECOLOGIE DE LA FAUNE TERRESTRE",
+    "MODELISATION EN GENIE CIVIL ET ENVIRONNEMENT",
+  ];
 
   const grades = [
     "Professeur",
     "Maître de Conférences",
     "Maître Assistant",
     "Assistant",
-  ]
+  ];
 
- useEffect(() => {
-  const fetchResearchers = async () => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select(`
-        id,
-        email,
-        first_name,
-        last_name,
-        title,
-        department,
-        laboratory,
-        avatar_url,
-        orcid_id,
-        research_interests,
-        office_location
-      `)
-      .eq("is_active", true)
-      .eq("role", "researcher");
+  useEffect(() => {
+    const fetchResearchers = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(`
+          id,
+          email,
+          first_name,
+          last_name,
+          title,
+          department,
+          laboratory,
+          orcid_id,
+          research_interests,
+          office_location
+        `)
+        .eq("is_active", true)
+        .eq("role", "researcher");
 
-    if (error) {
-      console.error("Erreur lors du chargement des profils:", error);
-      return;
-    }
+      if (error) {
+        console.error("Erreur lors du chargement des profils:", error);
+        setError("Échec du chargement des chercheurs.");
+        setLoading(false);
+        return;
+      }
 
-    // Add random stats to each researcher
-    const researchersWithStats = data.map((researcher) => ({
-      ...researcher,
-      publications: Math.floor(Math.random() * 100) + 5, // between 5–104
-      hIndex: Math.floor(Math.random() * 20) + 1,        // between 1–20
-      projects: Math.floor(Math.random() * 10) + 1       // between 1–10
-    }));
+      const researchersWithStats: Researcher[] = data.map((researcher) => {
+        const formattedEmail = researcher.email?.replace(/[@.]/g, "_");
+        const { data: avatarData } = supabase.storage
+          .from("avatars")
+          .getPublicUrl(`users/${formattedEmail}.jpg`);
+        const avatarUrl = avatarData?.publicUrl || "";
 
-    setResearchers(researchersWithStats);
-  };
+        return {
+          ...researcher,
+          avatar_url: avatarUrl,
+          publications: Math.floor(Math.random() * 100) + 5,
+          hIndex: Math.floor(Math.random() * 20) + 1,
+          projects: Math.floor(Math.random() * 10) + 1,
+        };
+      });
 
-  fetchResearchers();
-}, [supabase]);
+      setResearchers(researchersWithStats);
+      setLoading(false);
+    };
+
+    fetchResearchers();
+  }, [supabase]);
 
   const filteredResearchers = researchers.filter((researcher) => {
-    const fullName = `${researcher.first_name} ${researcher.last_name}`
+    const fullName = `${researcher.first_name} ${researcher.last_name}`;
     const matchesSearch =
       fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       researcher.laboratory?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       researcher.research_interests?.some((s) =>
         s.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      );
 
     const matchesDepartment =
-      selectedDepartment === "all" || researcher.department === selectedDepartment
+      selectedDepartment === "all" || researcher.department === selectedDepartment;
 
     const matchesGrade =
-      selectedGrade === "all" || researcher.title === selectedGrade
+      selectedGrade === "all" || researcher.title === selectedGrade;
 
-    return matchesSearch && matchesDepartment && matchesGrade
-  })
+    return matchesSearch && matchesDepartment && matchesGrade;
+  });
+
+  if (loading) return <p>Chargement...</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -167,7 +188,7 @@ export default function ResearchersPage() {
                   <SelectValue placeholder="Laboratoire" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Tous les laboratoires</SelectItem>
+                  <SelectItem value="all">Tous les laboratoires et Unités</SelectItem>
                   {departments.map((dept) => (
                     <SelectItem key={dept} value={dept}>
                       {dept}
@@ -205,12 +226,19 @@ export default function ResearchersPage() {
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
                     <Avatar className="w-16 h-16">
-                      <AvatarImage src={researcher.avatar_url || "/placeholder.svg"} />
-                      <AvatarFallback>
-                        {researcher.first_name[0]}
-                        {researcher.last_name[0]}
-                      </AvatarFallback>
-                    </Avatar>
+  <img
+    src={
+      researcher.avatar_url
+        ? `${researcher.avatar_url}`
+        : "/placeholder.svg?height=96&width=96"
+    }
+    alt="Avatar"
+    width={96}
+    height={96}
+    className="rounded-full object-cover"
+  />
+</Avatar>
+
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div>

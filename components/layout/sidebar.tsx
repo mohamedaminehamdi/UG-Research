@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import { Home, Users, BookOpen, Briefcase, BarChart3, MessageSquare, Settings, User, Search, Plus } from "lucide-react"
 
 const navigation = [
-  { name: "Tableau de bord", href: "/dashboard", icon: Home },
+  { name: "Tableau de bord", href: "/", icon: Home },
   { name: "Mon profil", href: "/profile", icon: User },
   { name: "Chercheurs", href: "/researchers", icon: Users },
   { name: "Publications", href: "/publications", icon: BookOpen },

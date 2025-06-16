@@ -31,9 +31,9 @@ export default function SignInPage() {
       const { data } = await supabase.auth.getSession()
       if (data.session) {
         startTransition(() => {
-  router.push("/dashboard")
+  router.push("/")
 })
-        console.log("Utilisateur déjà connecté, redirection vers le dashboard")
+        console.log("Utilisateur déjà connecté, redirection vers le Acceuil")
       }
     }
 
@@ -72,7 +72,7 @@ export default function SignInPage() {
       }
 
       console.log("Connexion réussie:", data.user?.id)
-        router.push("/dashboard")
+        router.push("/")
 
     } catch (error: any) {
         console.error("Full error object:", error)

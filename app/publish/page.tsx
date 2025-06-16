@@ -65,16 +65,30 @@ export default function CreatePublicationForm() {
 
     if (error) {
       setError(error.message)
-    } else {
-      setSuccessMessage("Publication ajoutée avec succès !")
-      setTimeout(() => {
-        router.push("/publications")
-      }, 1500)
-    }
+      return;
+    } 
+// 2. Create a notification to all users
+  const notif = {
+    user_id: null, // broadcast
+    title: "Nouvelle publication",
+    message: `📚 Une nouvelle publication intitulée "${title}" vient d’être ajoutée.`,
+    type: "publication",
+    action_url: "/publications", // you can make this dynamic if needed
+  };
 
-    setLoading(false)
+  const { error: notifError } = await supabase.from("notifications").insert(notif);
+
+  if (notifError) {
+    console.warn("Échec de la création de la notification :", notifError.message);
   }
 
+  setSuccessMessage("Publication ajoutée avec succès !");
+  setTimeout(() => {
+    router.push("/publications");
+  }, 1500);
+
+  setLoading(false);
+};
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-3xl p-8 bg-white rounded-lg shadow-md">

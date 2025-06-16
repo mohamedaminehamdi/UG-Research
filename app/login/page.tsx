@@ -38,7 +38,7 @@ export default function Login() {
 
       // Rediriger vers le tableau de bord
     
-    router.push('/dashboard');
+    router.push('/');
     } catch (error: any) {
       setError(error.message || "Une erreur s'est produite lors de la connexion")
     } finally {

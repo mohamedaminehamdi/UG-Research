@@ -52,13 +52,25 @@ export default function CreateResearchProject() {
 
     if (error) {
       setError(error.message)
-    } else {
-      setSuccessMessage("Projet de recherche créé avec succès.")
-      router.push("/projects")
-    }
+      return
+    } 
+     // Send notification
+  const { error: notifError } = await supabase.from("notifications").insert({
+    user_id: null, // broadcast to all users
+    title: "Nouveau projet de recherche",
+    message: `📢 Un nouveau projet intitulé "${title}" a été créé.`,
+    type: "research_project",
+    action_url: "/projects", // or `/projects/${projectData.id}` if you have a details page
+  })
 
-    setLoading(false)
+  if (notifError) {
+    console.warn("Échec de l'envoi de la notification :", notifError.message)
   }
+
+  setSuccessMessage("Projet de recherche créé avec succès.")
+  router.push("/projects")
+  setLoading(false)
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

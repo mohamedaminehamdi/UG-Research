@@ -26,54 +26,76 @@ import {
 import { Navigation } from "../components/navigation"
 
 export default function ProfilePage() {
+ const supabase = useSupabaseClient()
+
   const [isEditing, setIsEditing] = useState(false)
-   const [profile, setProfile] = useState<any>({
-  specialties: [],
-  education: [],
-  experience: [],
-  bio: "",
-})
+  const [profile, setProfile] = useState<any>({
+    specialties: [],
+    education: [],
+    experience: [],
+    bio: "",
+  })
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const supabase = useSupabaseClient()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
 
   useEffect(() => {
-  const fetchUserProfile = async () => {
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession()
+    const fetchUserProfileAndAvatar = async () => {
+      setLoading(true)
+      setError(null)
 
-    if (sessionError || !session?.user) {
-      setError("Utilisateur non connecté.")
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+
+      if (sessionError || !session?.user) {
+        setError("Utilisateur non connecté.")
+        setLoading(false)
+        return
+      }
+
+      const userId = session.user.id
+      const userEmail = session.user.email
+      console.log("User ID:", userId)
+
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId) // or use .eq("user_id", userId) depending on your schema
+        .single()
+
+      if (profileError || !profileData) {
+        console.error("Profile error:", profileError)
+        setError("Profil introuvable.")
+      } else {
+        setProfile(profileData)
+      }
+
+      /// Format email to storage key: replace @ and . with _
+      const formattedEmail = userEmail.replace(/[@.]/g, "_")
+
+      // Build storage path
+      const avatarPath = `users/${formattedEmail}.jpg`
+
+      // Get public URL for avatar
+      const { data: avatarData } = supabase.storage
+        .from("avatars")
+        .getPublicUrl(avatarPath)
+
+        setAvatarUrl(avatarData.publicUrl)
+  
+      
+
       setLoading(false)
-      return
     }
 
-    const userId = session.user.id
-    console.log("User ID:", userId) // ✅ Add this
+    fetchUserProfileAndAvatar()
+  }, [supabase])
 
-    // Try different column name if needed
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", userId) // ← try `id` if `user_id` doesn't work
-      .single()
 
-    if (profileError || !profileData) {
-      console.error("Profile error:", profileError) // ✅ log this
-      setError("Profil introuvable.")
-    } else {
-      setProfile(profileData)
-    }
-    
-
-    setLoading(false)
-  }
-
-  fetchUserProfile()
-}, [])
   if (loading) return <p className="text-center py-10">Chargement du profil...</p>
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>
   
@@ -188,8 +210,13 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <div className="text-center mb-6">
                   <Avatar className="w-24 h-24 mx-auto mb-4">
-                    <AvatarImage src="/placeholder.svg?height=96&width=96" />
-                    <AvatarFallback className="text-lg">AB</AvatarFallback>
+                    <img
+            src={avatarUrl || "/placeholder.svg?height=96&width=96"}
+            alt="Avatar"
+            width={96}
+            height={96}
+            className="rounded-full"
+          />
                   </Avatar>
                   {isEditing ? (
                     <div className="space-y-2">

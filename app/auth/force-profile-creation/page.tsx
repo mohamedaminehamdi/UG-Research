@@ -46,7 +46,7 @@ export default function ForceProfileCreationPage() {
         if (existingProfile) {
           setSuccess(true)
           setTimeout(() => {
-            router.push("/dashboard")
+            router.push("/")
           }, 2000)
           return
         }
@@ -71,7 +71,7 @@ export default function ForceProfileCreationPage() {
         // 5. Profil créé avec succès
         setSuccess(true)
         setTimeout(() => {
-          router.push("/dashboard")
+          router.push("/")
         }, 2000)
       } catch (error: any) {
         console.error("Erreur lors de la création forcée du profil:", error)
@@ -122,7 +122,7 @@ export default function ForceProfileCreationPage() {
                   <p>Email: {userEmail}</p>
                 </div>
               )}
-              <Button onClick={() => router.push("/dashboard")} className="mt-4">
+              <Button onClick={() => router.push("/")} className="mt-4">
                 Aller au tableau de bord
               </Button>
             </div>
