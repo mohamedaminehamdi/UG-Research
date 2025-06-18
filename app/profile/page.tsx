@@ -24,7 +24,30 @@ import {
   Award,
 } from "lucide-react"
 import { Navigation } from "../components/navigation"
-
+type Publication = {
+  id: string
+  author_id: string
+  title: string
+  abstract?: string | null
+  publication_type: string
+  journal_name?: string | null
+  conference_name?: string | null
+  publication_date?: string | null // ISO date string
+  doi?: string | null
+  isbn?: string | null
+  pages?: string | null
+  volume?: string | null
+  issue?: string | null
+  publisher?: string | null
+  keywords?: string[] | null
+  co_authors?: string[] | null
+  pdf_url?: string | null
+  external_url?: string | null
+  citation_count?: number | null
+  is_published?: boolean | null
+  created_at: string
+  updated_at: string
+}
 export default function ProfilePage() {
  const supabase = useSupabaseClient()
 
@@ -100,83 +123,16 @@ export default function ProfilePage() {
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>
   
   const publications = [
-    {
-      title: "Intelligence Artificielle et Traitement du Langage Naturel : Approches Modernes",
-      journal: "Journal of AI Research",
-      year: 2024,
-      type: "Article",
-      citations: 15,
-      doi: "10.1016/j.jair.2024.01.001",
-    },
-    {
-      title: "Deep Learning for Arabic Text Classification",
-      journal: "Computer Science Review",
-      year: 2023,
-      type: "Article",
-      citations: 28,
-      doi: "10.1016/j.cosrev.2023.08.002",
-    },
-    {
-      title: "Machine Learning Applications in Education",
-      journal: "Educational Technology Research",
-      year: 2023,
-      type: "Communication",
-      citations: 12,
-      doi: "10.1080/etr.2023.12.4.001",
-    },
   ]
 
   const projects = [
-    {
-      title: "Intelligence Artificielle pour la Santé",
-      role: "Responsable Principal",
-      status: "En cours",
-      period: "2023-2026",
-      budget: "200,000 TND",
-    },
-    {
-      title: "Plateforme d'Apprentissage Adaptatif",
-      role: "Co-investigateur",
-      status: "Terminé",
-      period: "2021-2023",
-      budget: "120,000 TND",
-    },
   ]
 
   const collaborations = [
-    {
-      name: "Prof. Sarah Johnson",
-      institution: "MIT",
-      country: "États-Unis",
-      projects: 3,
-    },
-    {
-      name: "Dr. Pierre Martin",
-      institution: "Université de Montpellier",
-      country: "France",
-      projects: 2,
-    },
-    {
-      name: "Prof. Maria Garcia",
-      institution: "Universidad de Barcelona",
-      country: "Espagne",
-      projects: 1,
-    },
   ]
 
   const awards = [
-    {
-      title: "Prix d'Excellence en Recherche",
-      organization: "Université de Gabès",
-      year: 2023,
-      description: "Pour contributions exceptionnelles en IA",
-    },
-    {
-      title: "Best Paper Award",
-      organization: "International Conference on AI",
-      year: 2022,
-      description: "Meilleur article de la conférence",
-    },
+
   ]
 
   return (
@@ -317,8 +273,6 @@ export default function ProfilePage() {
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="overview">Aperçu</TabsTrigger>
-                <TabsTrigger value="publications">Publications</TabsTrigger>
-                <TabsTrigger value="projects">Projets</TabsTrigger>
                 <TabsTrigger value="collaborations">Collaborations</TabsTrigger>
                 <TabsTrigger value="awards">Distinctions</TabsTrigger>
               </TabsList>
@@ -341,73 +295,7 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
 
-              <TabsContent value="publications">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5" />
-                      Publications ({publications.length})
-                    </CardTitle>
-                    <CardDescription>Liste de mes publications scientifiques</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {publications.map((pub, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h4 className="font-semibold mb-1">{pub.title}</h4>
-                              <p className="text-gray-600 text-sm mb-2">
-                                {pub.journal} • {pub.year}
-                              </p>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline">{pub.type}</Badge>
-                                <span className="text-sm text-gray-500">{pub.citations} citations</span>
-                              </div>
-                            </div>
-                            <Button variant="outline" size="sm" asChild>
-                              <a href={`https://doi.org/${pub.doi}`} target="_blank" rel="noreferrer">
-                                <ExternalLink className="w-4 h-4" />
-                              </a>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="projects">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="w-5 h-5" />
-                      Projets de Recherche ({projects.length})
-                    </CardTitle>
-                    <CardDescription>Mes projets de recherche actuels et passés</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {projects.map((project, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex items-start justify-between mb-2">
-                            <h4 className="font-semibold">{project.title}</h4>
-                            <Badge variant={project.status === "En cours" ? "default" : "secondary"}>
-                              {project.status}
-                            </Badge>
-                          </div>
-                          <p className="text-gray-600 text-sm mb-2">Rôle: {project.role}</p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span>{project.period}</span>
-                            <span className="font-medium text-green-600">{project.budget}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+              
 
               <TabsContent value="collaborations">
                 <Card>

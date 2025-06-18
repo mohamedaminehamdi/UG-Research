@@ -189,7 +189,10 @@ export default function SignUpPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="photo">Photo de profil</Label>
+                <div className="flex items-center gap-2">
+    <Label htmlFor="photo">Photo de profil</Label>
+    <Label className="text-red-600 font-semibold">type JPG Obligatoire</Label>
+  </div>
                 <Input
                   id="photo"
                   type="file"
