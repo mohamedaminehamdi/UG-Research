@@ -102,6 +102,11 @@ export default function Login() {
             Pas encore de compte? S'inscrire
           </Link>
         </div>
+        <div className="text-sm text-center">
+          <Link href="/auth/forgot-password" className="text-blue-600 hover:text-blue-500">
+            Mot de passe oublié?
+          </Link>
+        </div>
       </div>
     </div>
   )
