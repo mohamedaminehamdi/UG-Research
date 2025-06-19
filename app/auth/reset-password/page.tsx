@@ -114,7 +114,7 @@ export default function ResetPasswordPage() {
                 <p className="text-gray-600">
                   Votre mot de passe a été mis à jour. Vous allez être redirigé vers la page de connexion...
                 </p>
-                <Link href="/auth/signin">
+                <Link href="/login">
                   <Button className="mt-4 w-full">Se connecter</Button>
                 </Link>
               </div>

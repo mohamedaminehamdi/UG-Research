@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Edit,
@@ -62,7 +63,11 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
-
+const [publications, setPublications] = useState<Publication[]>([])
+const [projects, setProjects] = useState([])
+function getRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
   useEffect(() => {
     const fetchUserProfileAndAvatar = async () => {
       setLoading(true)
@@ -98,7 +103,7 @@ export default function ProfilePage() {
       }
 
       /// Format email to storage key: replace @ and . with _
-      const formattedEmail = userEmail.replace(/[@.]/g, "_")
+      const formattedEmail = userEmail?.replace(/[@.]/g, "_")
 
       // Build storage path
       const avatarPath = `users/${formattedEmail}.jpg`
@@ -110,7 +115,57 @@ export default function ProfilePage() {
 
         setAvatarUrl(avatarData.publicUrl)
   
-      
+       // 🔽 Fetch user publications
+    const { data: publicationsData, error: publicationsError } = await supabase
+      .from("publications")
+      .select("*")
+      .eq("author_id", userId)
+      .order("publication_date", { ascending: false })
+
+    if (publicationsError) {
+      console.error("Error fetching publications:", publicationsError)
+    } else {
+      setPublications(publicationsData)
+    }
+     // 🔽 Fetch user projects
+    const { data: projectsData, error: projectsError } = await supabase
+      .from("research_projects")
+      .select("*")
+      .eq("principal_investigator_id", userId)
+
+    if (projectsError) {
+      console.error("Error fetching projects:", projectsError)
+    } else {
+      // Optional mapping
+      const departments = ["Informatique", "Biotech", "Mathématiques"]
+      const types = ["Recherche fondamentale", "Recherche appliquée"]
+      const statuses = ["En cours", "Terminé", "En attente"]
+
+      const mapped = projectsData.map((project, i) => ({
+        id: project.id,
+        title: project.title,
+        description: project.description || "Aucune description disponible.",
+        responsible: {
+          name: `Chercheur #${i + 1}`, // unless you join profiles
+          avatar: "/placeholder.svg?height=40&width=40",
+        },
+        department: getRandom(departments),
+        type: getRandom(types),
+        status: project.status || getRandom(statuses),
+        progress: Math.floor(Math.random() * 101),
+        startDate: project.start_date || "2023-01-01",
+        endDate: project.end_date || "2025-12-31",
+        budget: project.budget ? `${project.budget.toLocaleString()} TND` : "Non spécifié",
+        funding: project.funding_source || "Inconnu",
+        partners: [],
+        objectives: project.objectives?.split("\n") || ["Objectif non spécifié"],
+        team: Math.floor(Math.random() * 20 + 5),
+        publications: Math.floor(Math.random() * 10),
+      }))
+
+      setProjects(mapped) // Make sure you have: const [projects, setProjects] = useState<ProjectType[]>([])
+    }
+
 
       setLoading(false)
     }
@@ -122,17 +177,13 @@ export default function ProfilePage() {
   if (loading) return <p className="text-center py-10">Chargement du profil...</p>
   if (error) return <p className="text-center py-10 text-red-500">{error}</p>
   
-  const publications = [
-  ]
 
-  const projects = [
-  ]
 
   const collaborations = [
   ]
 
   const awards = [
-
+  
   ]
 
   return (
@@ -143,6 +194,7 @@ export default function ProfilePage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <h1 className="text-3xl font-bold">Mon Profil</h1>
+             <div className="flex items-center justify-between">
             <Button onClick={() => setIsEditing(!isEditing)} variant={isEditing ? "default" : "outline"}>
               {isEditing ? (
                 <>
@@ -156,7 +208,15 @@ export default function ProfilePage() {
                 </>
               )}
             </Button>
+            <Button asChild>
+  <Link href="/auth/forgot-password">
+    <Edit className="w-4 h-4 mr-2" />
+    Changer le mot de passe
+  </Link>
+</Button>
           </div>
+          </div>
+
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -273,6 +333,8 @@ export default function ProfilePage() {
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="overview">Aperçu</TabsTrigger>
+                <TabsTrigger value="publications">Publications</TabsTrigger>
+                <TabsTrigger value="projects">Projets</TabsTrigger>
                 <TabsTrigger value="collaborations">Collaborations</TabsTrigger>
                 <TabsTrigger value="awards">Distinctions</TabsTrigger>
               </TabsList>
@@ -295,7 +357,98 @@ export default function ProfilePage() {
                   </CardContent>
                 </Card>
 
-              
+              <TabsContent value="publications">
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex items-center gap-2">
+        <BookOpen className="w-5 h-5" />
+        Publications ({publications.length})
+      </CardTitle>
+      <CardDescription>Liste de mes publications scientifiques</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-4">
+        {publications.map((pub, index) => {
+          const venue = pub.journal_name || pub.conference_name || pub.publisher || "—"
+          const year = pub.publication_date
+            ? new Date(pub.publication_date).getFullYear()
+            : "—"
+          return (
+            <div key={index} className="border rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h4 className="font-semibold mb-1">{pub.title}</h4>
+                  <p className="text-gray-600 text-sm mb-2">
+                    {venue} • {year}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">{pub.publication_type}</Badge>
+                    {pub.citation_count !== null && (
+                      <span className="text-sm text-gray-500">
+                        {pub.citation_count} citation
+                        {pub.citation_count !== 1 && "s"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {pub.doi && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={`https://doi.org/${pub.doi}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
+
+
+              <TabsContent value="projects">
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex items-center gap-2">
+        <Target className="w-5 h-5" />
+        Projets de Recherche ({projects.length})
+      </CardTitle>
+      <CardDescription>Mes projets de recherche actuels et passés</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="space-y-4">
+        {projects.map((project, index) => {
+          const start = project.startDate ? new Date(project.startDate).toLocaleDateString() : "—"
+          const end = project.endDate ? new Date(project.endDate).toLocaleDateString() : "—"
+          const period = `${start} → ${end}`
+
+          return (
+            <div key={index} className="border rounded-lg p-4">
+              <div className="flex items-start justify-between mb-2">
+                <h4 className="font-semibold">{project.title}</h4>
+                <Badge variant={project.status === "En cours" ? "default" : "secondary"}>
+                  {project.status}
+                </Badge>
+              </div>
+              <p className="text-gray-600 text-sm mb-2">Rôle: Responsable</p>
+              <div className="flex items-center justify-between text-sm text-gray-500">
+                <span>{period}</span>
+                <span className="font-medium text-green-600">{project.budget}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </CardContent>
+  </Card>
+</TabsContent>
+
 
               <TabsContent value="collaborations">
                 <Card>
